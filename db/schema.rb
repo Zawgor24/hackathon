@@ -10,17 +10,26 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180127124940) do
+ActiveRecord::Schema.define(version: 20180127195312) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
-  create_table "products", force: :cascade do |t|
-    t.string "name"
-    t.text "description"
-    t.integer "price"
+  create_table "customers", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "products", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "products_wishlists", id: false, force: :cascade do |t|
+    t.bigint "product_id"
+    t.bigint "wishlist_id"
+    t.index ["product_id"], name: "index_products_wishlists_on_product_id"
+    t.index ["wishlist_id"], name: "index_products_wishlists_on_wishlist_id"
   end
 
   create_table "shops", force: :cascade do |t|
@@ -31,4 +40,12 @@ ActiveRecord::Schema.define(version: 20180127124940) do
     t.index ["shopify_domain"], name: "index_shops_on_shopify_domain", unique: true
   end
 
+  create_table "wishlists", force: :cascade do |t|
+    t.bigint "customer_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["customer_id"], name: "index_wishlists_on_customer_id"
+  end
+
+  add_foreign_key "wishlists", "customers"
 end
