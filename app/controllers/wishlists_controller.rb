@@ -1,18 +1,21 @@
 class WishlistsController < ApplicationController
-  def index
-    wishlist = Customer.find(params[:data_hash][:customer_id]).wishlist
+  before_action :find_customer, only: %i[index]
 
-    products_data = wishlist.products
+  include WishlistsHelper
+
+  def index
+    wishlist_products = @customer.wishlist.products
 
     response.headers['Access-Control-Allow-Origin'] = '*'
 
-    render json: products_data, status: :ok
+    render json: wishlist_products, status: :ok
   end
 
   def create
     customer = Customer.find_or_create_by(id: params[:data_hash][:customer_id])
     product = Product.find_or_create_by(id: params[:data_hash][:product_id])
-    product.update(title: params[:data_hash][:product_title], price: params[:data_hash][:product_price],
+
+    product.update(title: params[:data_hash][:product_title], price: fix_price(params[:data_hash][:product_price]).to_f,
       handle: params[:data_hash][:product_handle])
 
     customer.create_wishlist if customer.wishlist.blank?
@@ -24,12 +27,23 @@ class WishlistsController < ApplicationController
   end
 
   def destroy
-    
+    customer = Customer.find(params[:customer_id])
+    product = Product.find(params[:product_id])
+
+    customer.wishlist.products.delete(product)
+
+    response.headers['Access-Control-Allow-Origin'] = '*'
+
+    render json: true, status: :ok
   end
 
   private
 
-  def product_params
-    params.require(:data).permit(:title, :price, :handle)    
+  def customer_params
+     
+  end
+
+  def find_customer
+    @customer = Customer.find_by(id: params[:data_hash][:customer_id])
   end
 end

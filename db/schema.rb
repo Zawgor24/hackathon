@@ -24,7 +24,7 @@ ActiveRecord::Schema.define(version: 20180128002759) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "title"
-    t.integer "price"
+    t.float "price"
     t.string "handle"
   end
 
